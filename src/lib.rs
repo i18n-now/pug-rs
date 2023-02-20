@@ -8,14 +8,14 @@ use std::io::Write;
 
 #[derive(Debug)]
 pub enum Error<E> {
-    Parser(pest::error::Error<Rule>),
+    Parser(Box<pest::error::Error<Rule>>),
     Include(E),
     Io(std::io::Error),
 }
 
 impl<E: Debug> From<pest::error::Error<Rule>> for Error<E> {
     fn from(e : pest::error::Error<Rule>) -> Self {
-        Error::Parser(e)
+        Error::Parser(Box::new(e))
     }
 }
 
@@ -60,7 +60,7 @@ impl Ast {
                 return inc(self.id.as_ref().unwrap().to_string()).map_err(Error::Include)?.expand(inc.clone());
             }
             _ => {
-                for child in std::mem::replace(&mut self.children, Vec::new()) {
+                for child in std::mem::take(&mut self.children) {
                     eprintln!("{}", child.element);
                     self.children.push(child.expand(inc.clone())?);
                 };
@@ -147,14 +147,13 @@ impl Ast {
     }
 }
 
-fn parse_impl(file: &str) -> Result<Ast, pest::error::Error<Rule>> {
+fn parse_impl(file: &str) -> Result<Ast, Box<pest::error::Error<Rule>>> {
     let mut file = PugParser::parse(Rule::file, file)?;
 
     let mut comment = None;
     let mut indent = 0;
 
-    let mut cur     = Ast::default();
-    cur.element     = ":document".into();
+	let mut cur = Ast { element: ":document".into(), ..Default::default() };
     let mut stack : Vec<(usize, Ast)> = Vec::new();
 
     for decl in file.next().unwrap().into_inner() {
@@ -171,7 +170,7 @@ fn parse_impl(file: &str) -> Result<Ast, pest::error::Error<Rule>> {
 
                 while let Some((ind, mut ast)) = stack.pop() {
                     if ind >= indent {
-                        ast.children.push(std::mem::replace(&mut cur, Ast::default()));
+                        ast.children.push(std::mem::take(&mut cur));
                         cur = ast;
                     } else {
                         stack.push((ind,ast));
@@ -191,7 +190,7 @@ fn parse_impl(file: &str) -> Result<Ast, pest::error::Error<Rule>> {
                     continue;
                 }
 
-                let parent = std::mem::replace(&mut cur, Ast::default());
+                let parent = std::mem::take(&mut cur);
                 stack.push((indent, parent));
 
                 cur.element = "div".into();
@@ -244,11 +243,11 @@ fn parse_impl(file: &str) -> Result<Ast, pest::error::Error<Rule>> {
             }
             Rule::EOI => {
                 for (_, mut ast) in stack.drain(..).rev() {
-                    ast.children.push(std::mem::replace(&mut cur, Ast::default()));
+                    ast.children.push(std::mem::take(&mut cur));
                     cur = ast;
                 }
             }
-            any => panic!(println!("parser bug. did not expect: {:?}", any)),
+            any => panic!("parser bug. did not expect: {:?}", any),
         }
     }
 
@@ -256,7 +255,7 @@ fn parse_impl(file: &str) -> Result<Ast, pest::error::Error<Rule>> {
 }
 
 /// parse a Pug template into an abstract syntax tree
-pub fn parse<S: Into<String>>(file: S) -> Result<Ast, pest::error::Error<Rule>> {
+pub fn parse<S: Into<String>>(file: S) -> Result<Ast, Box<pest::error::Error<Rule>>> {
     let mut file = file.into();
     file.push('\n');
     parse_impl(&file)
@@ -439,5 +438,4 @@ kebab
         r#"<!DOCTYPE html><kebab>tomato</kebab>"#
     );
 }
-
 
