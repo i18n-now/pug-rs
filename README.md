@@ -1,22 +1,13 @@
-DED
-====================
+# pug-rs
 
-since i no longer work with rust, this crate is canceled as well.
-it is fairly simple anyway and if i ever work with pug/jade again, i'll probably reimplement it in zetz.
+![crates.io](https://img.shields.io/crates/v/pug?style=for-the-badge)
 
+A port of [pug](https://pugjs.org) to Rust.
 
-pug (jade) templates
----------------------
+This is a maintained fork of the [original code by
+github.com/aep](https://github.com/aep/pug-rs).
 
-reimplemented in rust for performance reasons.
-
-| pug.js | pug-rs |
-|--------|--------|
-| 780ms  | 29ms   |
-
-
-usage:
--------
+## CLI usage
 
 ```
 $ cargo install pug
@@ -24,9 +15,7 @@ $ pug < thing.pug > thing.html
 ```
 
 
-with webpack:
-------------
-
+## Using with webpack
 
 pug_loader.js:
 ```javascript
@@ -42,7 +31,8 @@ module.exports = function(source) {
 }
 ```
 
-```
+webpack.config.js
+```javascript
   module: {
     rules: [
       {
@@ -51,3 +41,4 @@ module.exports = function(source) {
       },
 
 ```
+
