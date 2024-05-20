@@ -1,11 +1,15 @@
 [package]
 name = "ipug"
 version = "0.2.0"
-authors = ["Arvid E. Picciani <aep@exys.org>", "Blair Noctis <n@sail.ng>"]
+authors = [
+  "Arvid E. Picciani <aep@exys.org>",
+  "Blair Noctis <n@sail.ng>",
+  "i18n.site@gmail.com",
+]
 edition = '2021'
 license = "MIT"
 description = "pug.js port to Rust"
-repository = "https://github.com/bnoctis/pug-rs"
+repository = "https://github.com/i18n-now/pug-rs"
 readme = "README.md"
 keywords = ["pug", "jade", "template"]
 categories = [
