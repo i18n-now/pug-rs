@@ -1,4 +1,4 @@
-use pug::parse;
+use ipug::parse;
 use std::io::{self, Read};
 
 fn main() {
