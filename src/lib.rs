@@ -61,7 +61,6 @@ impl Ast {
             }
             _ => {
                 for child in std::mem::take(&mut self.children) {
-                    eprintln!("{}", child.element);
                     self.children.push(child.expand(inc.clone())?);
                 };
                 Ok(self)
@@ -185,7 +184,6 @@ fn parse_impl(file: &str) -> Result<Ast, Box<pest::error::Error<Rule>>> {
                 cur.children.push(Ast::special(":doctype", decl.into_inner().as_str()));
             }
             Rule::tag => {
-                eprintln!("tag: {}", decl.as_str());
                 if comment.is_some() {
                     continue;
                 }
