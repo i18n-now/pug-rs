@@ -1,6 +1,6 @@
 [package]
 name = "ipug"
-version = "0.2.0"
+version = "0.2.1"
 authors = [
   "Arvid E. Picciani <aep@exys.org>",
   "Blair Noctis <n@sail.ng>",

@@ -1,6 +1,6 @@
 #[macro_use]
 extern crate pest_derive;
-
+use std::io::Cursor;
 use std::fmt::Debug;
 pub use pest::RuleType;
 use pest::Parser;
@@ -66,6 +66,13 @@ impl Ast {
                 Ok(self)
             }
         }
+    }
+
+    pub fn to_str(&self) -> Result<String, std::io::Error>{
+        let mut buffer = Vec::new();
+        let mut writer = Cursor::new(&mut buffer);
+        self.to_html(&mut writer)?;
+        Ok(String::from_utf8_lossy(&buffer).into())
     }
 
     pub fn to_html<W>(&self, w: &mut W) -> Result<(), std::io::Error>
@@ -436,4 +443,3 @@ kebab
         r#"<!DOCTYPE html><kebab>tomato</kebab>"#
     );
 }
-
